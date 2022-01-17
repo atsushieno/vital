@@ -648,7 +648,7 @@ void WavetableEditSection::convertFiles(const File& wavetable_directory, const F
     if (!parent)
         return;
 
-    for (auto& file : wavetable_directory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.wav")) {
+    for (auto& file : wavetable_directory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.wav;*.WAV")) {
         init();
         loadFile(file);
         wavetable_creator_->setName(file.getFileNameWithoutExtension().toStdString());
@@ -661,7 +661,7 @@ void WavetableEditSection::convertFiles(const File& wavetable_directory, const F
 
 void WavetableEditSection::loadFile(const File& wavetable_file) {
   clear();
-  if (wavetable_file.getFileExtension() == ".wav") {
+  if (!wavetable_file.getFileExtension().compareIgnoreCase(".wav")) {
     FileInputStream* input_stream = new FileInputStream(wavetable_file);
     loadAudioAsWavetable(wavetable_file.getFileNameWithoutExtension(), input_stream,
                          WavetableCreator::kWavetableSplice);
