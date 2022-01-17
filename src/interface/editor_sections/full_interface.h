@@ -129,6 +129,7 @@ class FullInterface : public SynthSection, public AuthenticationSection::Listene
     void loadDefaultWavetable(int index);
     void resynthesizeToWavetable(int index);
     void saveWavetable(int index);
+    void saveWavetableNoUI(int index, File& savedFilePath);
     void saveLfo(const json& data);
     json getWavetableJson(int index);
     bool loadAudioAsWavetable(int index, const String& name, InputStream* audio_stream,

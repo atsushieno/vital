@@ -859,6 +859,19 @@ void FullInterface::saveWavetable(int index) {
   save_section_->setVisible(true);
 }
 
+void FullInterface::saveWavetableNoUI(int index, File& savedFilePath) {
+    save_section_->setIsPreset(false);
+    save_section_->setSaveBounds();
+    save_section_->setFileExtension(vital::kWavetableExtension);
+    save_section_->setFileType("Wavetable");
+    File destination = savedFilePath.getParentDirectory();
+    if (!destination.exists())
+        destination.createDirectory();
+    save_section_->setDirectory(destination);
+    save_section_->setFileData(getWavetableJson(index));
+    save_section_->exposedSave(savedFilePath.getFileNameWithoutExtension());
+}
+
 void FullInterface::saveLfo(const json& data) {
   save_section_->setIsPreset(false);
   save_section_->setFileExtension(vital::kLfoExtension);

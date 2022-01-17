@@ -87,6 +87,8 @@ namespace {
       wavetable_edit_section->saveAsWavetable(); 
     else if (result == WavetableEditSection::kImportWavetable)
       wavetable_edit_section->importWavetable();
+    else if (result == WavetableEditSection::kBatchImportWavetables)
+        wavetable_edit_section->convertWavetables();
     else if (result == WavetableEditSection::kExportWavetable)
       wavetable_edit_section->exportWavetable();
     else if (result == WavetableEditSection::kExportWav)
@@ -409,6 +411,7 @@ void WavetableEditSection::showPopupMenu() {
 
   options.addItem(kSaveAsWavetable, "Save As Wavetable");
   options.addItem(kImportWavetable, "Import Wavetable");
+  options.addItem(kBatchImportWavetables, "Batch Import Wavetables");
   options.addItem(kExportWavetable, "Export Wavetable");
   options.addItem(kExportWav, "Export to .wav File");
   options.addItem(kResynthesizeWavetable, "Synthesize Preset to Table");
@@ -583,6 +586,21 @@ void WavetableEditSection::importWavetable() {
   }
 }
 
+void WavetableEditSection::convertWavetables() {
+    FileChooser open_box("Convert Wavetables", File());
+    if (open_box.browseForDirectory()) {
+        if (!open_box.getResult().exists())
+            return;
+        File destinationBase = LoadSave::getUserWavetableDirectory();
+        FileChooser save_box("Directory to export .wav Files", destinationBase);
+        if (save_box.browseForDirectory()) {
+            if (!save_box.getResult().exists())
+                return;
+            convertFiles(open_box.getResult(), save_box.getResult());
+        }
+    }
+}
+
 void WavetableEditSection::exportWavetable() {
   FileChooser save_box("Export Wavetable", File(), String("*.") + vital::kWavetableExtension);
   if (save_box.browseForFileToSave(true)) {
@@ -623,6 +641,22 @@ void WavetableEditSection::exportToWav() {
 
   writer = nullptr;
   file_stream.release();
+}
+
+void WavetableEditSection::convertFiles(const File& wavetable_directory, const File& destination_directory) {
+    FullInterface* parent = findParentComponentOfClass<FullInterface>();
+    if (!parent)
+        return;
+
+    for (auto& file : wavetable_directory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.wav")) {
+        init();
+        loadFile(file);
+        wavetable_creator_->setName(file.getFileNameWithoutExtension().toStdString());
+
+        auto relPath = file.getRelativePathFrom(wavetable_directory);
+        File destinationFile{destination_directory.getFullPathName() + "/" + relPath};
+        parent->saveWavetableNoUI(0, destinationFile);
+    }
 }
 
 void WavetableEditSection::loadFile(const File& wavetable_file) {

@@ -52,6 +52,7 @@ class WavetableEditSection : public SynthSection,
       kCancelled,
       kSaveAsWavetable,
       kImportWavetable,
+      kBatchImportWavetables,
       kExportWavetable,
       kExportWav,
       kResynthesizeWavetable,
@@ -105,9 +106,11 @@ class WavetableEditSection : public SynthSection,
     void loadDefaultWavetable();
     void saveAsWavetable();
     void importWavetable();
+    void convertWavetables();
     void exportWavetable();
     void exportToWav();
     void loadFile(const File& wavetable_file) override;
+    void convertFiles(const File& wavetable_directory, const File& destination_directory);
     File getCurrentFile() override { return File(wavetable_creator_->getLastFileLoaded()); }
 
     void loadWavetable(json& wavetable_data);

@@ -82,6 +82,11 @@ class SaveSection : public Overlay, public TextEditor::Listener {
 
     void addSaveListener(Listener* listener) { listeners_.push_back(listener); }
 
+    void exposedSave(String name) {
+        name_->setText(name, false);
+        save();
+    }
+
   private:
     void save();
 
